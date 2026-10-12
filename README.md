@@ -7,9 +7,9 @@ A self-hosted environment for understanding, running, and exploring the OnAirHQ 
 ```mermaid
 flowchart TB
     User["👤 Listener"]
-    Web["🌐 Web Player<br/>(Next.js)"]
-    IC["📡 Icecast<br/>(streaming server)"]
-    LS["🎛️ Liquidsoap<br/>(radio automation)"]
+    Web["🌐 onairhq/web<br/>(Next.js)"]
+    IC["📡 onairhq/icecast2<br/>(streaming server)"]
+    LS["🎛️ onairhq/liquidsoap<br/>(radio automation)"]
     GW["🔌 s3sg<br/>(internal S3 gateway)"]
     S3["☁️ S3 Storage<br/>(tracks + jingles)"]
     Disk["💾 Local folders<br/>(tracks / jingles)"]
