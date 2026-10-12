@@ -2,6 +2,34 @@
 
 A self-hosted environment for understanding, running, and exploring the OnAirHQ ecosystem.
 
+## Repositories
+
+OnAirHQ is split into separate repositories. Each one does a single job, and together they make a complete internet radio.
+
+| Repository | What it is | Responsible for | Tech |
+|---|---|---|---|
+| [**onairhq/onairhq**](https://github.com/onairhq/onairhq) | This repo | Docker Compose environment to run and explore the whole system, plus the architecture docs | Docker Compose |
+| [**onairhq/web**](https://github.com/onairhq/web) | Web Player | The page listeners open: plays the stream and shows the current song and cover. [Live demo](https://onairhq.github.io/web/) | Next.js, React, TypeScript |
+| [**onairhq/icecast2**](https://github.com/onairhq/icecast2) | Streaming server | Receives the audio from Liquidsoap and delivers it to all listeners. Handles mountpoints, listener limits and passwords | Docker image (built from upstream Icecast), Shell |
+| [**onairhq/liquidsoap**](https://github.com/onairhq/liquidsoap) | Radio automation | Decides what plays: shuffles tracks, inserts jingles, skips silence, normalizes volume, fetches cover art, and sends the result to Icecast. Includes the `s3sg` gateway for S3 storage | Docker image (Liquidsoap), Go |
+
+### Responsibility at a glance
+
+| Question | Answered by |
+|---|---|
+| "How do I run everything together?" | [onairhq](https://github.com/onairhq/onairhq) |
+| "What does the listener see and hear?" | [web](https://github.com/onairhq/web) |
+| "Who delivers the audio to listeners?" | [icecast2](https://github.com/onairhq/icecast2) |
+| "Who chooses which song plays next?" | [liquidsoap](https://github.com/onairhq/liquidsoap) |
+| "Where are the songs stored?" | Local folders or S3, read through [liquidsoap](https://github.com/onairhq/liquidsoap) |
+
+### Docker images
+
+| Service | Image |
+|---|---|
+| Icecast | `ghcr.io/onairhq/icecast2:latest` |
+| Liquidsoap | `ghcr.io/onairhq/liquidsoap:latest` |
+
 # Architecture
 
 ```mermaid
