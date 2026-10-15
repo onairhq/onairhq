@@ -1,34 +1,37 @@
-# OnAirHQ 
+# OnAirHQ
 
 A self-hosted environment for understanding, running, and exploring the OnAirHQ ecosystem.
+
+## [DEMO-PLAYER](https://onairhq.github.io/web)
 
 ## Repositories
 
 OnAirHQ is split into separate repositories. Each one does a single job, and together they make a complete internet radio.
 
-| Repository | What it is | Responsible for | Tech |
-|---|---|---|---|
-| [**onairhq/onairhq**](https://github.com/onairhq/onairhq) | This repo | Docker Compose environment to run and explore the whole system, plus the architecture docs | Docker Compose |
-| [**onairhq/web**](https://github.com/onairhq/web) | Web Player | The page listeners open: plays the stream and shows the current song and cover. [Live demo](https://onairhq.github.io/web/) | Next.js, React, TypeScript |
-| [**onairhq/icecast2**](https://github.com/onairhq/icecast2) | Streaming server | Receives the audio from Liquidsoap and delivers it to all listeners. Handles mountpoints, listener limits and passwords | Docker image (built from upstream Icecast), Shell |
-| [**onairhq/liquidsoap**](https://github.com/onairhq/liquidsoap) | Radio automation | Decides what plays: shuffles tracks, inserts jingles, skips silence, normalizes volume, fetches cover art, and sends the result to Icecast. Includes the `s3sg` gateway for S3 storage | Docker image (Liquidsoap), Go |
+| Repository                                                      | What it is       | Responsible for                                                                                                                                                                        | Tech                                              |
+| --------------------------------------------------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| [**onairhq/onairhq**](https://github.com/onairhq/onairhq)       | This repo        | Docker Compose environment to run and explore the whole system, plus the architecture docs                                                                                             | Docker Compose                                    |
+| [**onairhq/web**](https://github.com/onairhq/web)               | Web Player       | The page listeners open: plays the stream and shows the current song and cover. [Live demo](https://onairhq.github.io/web/)                                                            | Next.js, React, TypeScript                        |
+| [**onairhq/icecast2**](https://github.com/onairhq/icecast2)     | Streaming server | Receives the audio from Liquidsoap and delivers it to all listeners. Handles mountpoints, listener limits and passwords                                                                | Docker image (built from upstream Icecast), Shell |
+| [**onairhq/liquidsoap**](https://github.com/onairhq/liquidsoap) | Radio automation | Decides what plays: shuffles tracks, inserts jingles, skips silence, normalizes volume, fetches cover art, and sends the result to Icecast. Includes the `s3sg` gateway for S3 storage | Docker image (Liquidsoap), Go                     |
 
 ### Responsibility at a glance
 
-| Question | Answered by |
-|---|---|
-| "How do I run everything together?" | [onairhq](https://github.com/onairhq/onairhq) |
-| "What does the listener see and hear?" | [web](https://github.com/onairhq/web) |
-| "Who delivers the audio to listeners?" | [icecast2](https://github.com/onairhq/icecast2) |
-| "Who chooses which song plays next?" | [liquidsoap](https://github.com/onairhq/liquidsoap) |
-| "Where are the songs stored?" | Local folders or S3, read through [liquidsoap](https://github.com/onairhq/liquidsoap) |
+| Question                               | Answered by                                                                           |
+| -------------------------------------- | ------------------------------------------------------------------------------------- |
+| "How do I run everything together?"    | [onairhq](https://github.com/onairhq/onairhq)                                         |
+| "What does the listener see and hear?" | [web](https://github.com/onairhq/web)                                                 |
+| "Who delivers the audio to listeners?" | [icecast2](https://github.com/onairhq/icecast2)                                       |
+| "Who chooses which song plays next?"   | [liquidsoap](https://github.com/onairhq/liquidsoap)                                   |
+| "Where are the songs stored?"          | Local folders or S3, read through [liquidsoap](https://github.com/onairhq/liquidsoap) |
 
 ### Docker images
 
-| Service | Image |
-|---|---|
-| Icecast | `ghcr.io/onairhq/icecast2:latest` |
-| Liquidsoap | `ghcr.io/onairhq/liquidsoap:latest` |
+| Service    | Image                                   |
+| ---------- | --------------------------------------- |
+| Icecast    | `ghcr.io/onairhq/icecast2:2.5.0`        |
+| Liquidsoap | `ghcr.io/onairhq/liquidsoap:v2.4.5-rc1` |
+| WEB        | `ghcr.io/onairhq/web:v16.4.0-rc1`       |
 
 # Architecture
 
@@ -55,16 +58,17 @@ flowchart TB
     LS -.->|"C'. Alternative: reads files"| Disk
     LS -->|"E. Looks up the cover art<br/>GET /database/search"| DG
 ```
+
 ## Who talks to whom (short version)
 
-| From | To | In plain words |
-|---|---|---|
-| Browser (Web Player) | Icecast | The browser asks for the radio and receives continuous sound |
-| Liquidsoap | Icecast | Liquidsoap "broadcasts" the radio into Icecast |
-| Liquidsoap | Icecast (metadata) | Liquidsoap announces which song is playing now |
-| Liquidsoap | s3sg | Liquidsoap asks for the next track or jingle |
-| s3sg | S3 | The gateway fetches the audio file from storage |
-| Liquidsoap | Discogs | Liquidsoap looks up the album cover |
+| From                 | To                 | In plain words                                               |
+| -------------------- | ------------------ | ------------------------------------------------------------ |
+| Browser (Web Player) | Icecast            | The browser asks for the radio and receives continuous sound |
+| Liquidsoap           | Icecast            | Liquidsoap "broadcasts" the radio into Icecast               |
+| Liquidsoap           | Icecast (metadata) | Liquidsoap announces which song is playing now               |
+| Liquidsoap           | s3sg               | Liquidsoap asks for the next track or jingle                 |
+| s3sg                 | S3                 | The gateway fetches the audio file from storage              |
+| Liquidsoap           | Discogs            | Liquidsoap looks up the album cover                          |
 
 ---
 
@@ -73,10 +77,10 @@ flowchart TB
 **Request type:** `GET` (HTTP, connection stays open)
 **Example address:** `http://localhost:8000/radio.mp3`
 
-| Sends | Receives |
-|---|---|
-| A simple listen request (usually via an `<audio>` tag), no password | Continuous MP3 audio (128 kbps by default) |
-| | Song title and cover URL, inside the stream metadata |
+| Sends                                                               | Receives                                             |
+| ------------------------------------------------------------------- | ---------------------------------------------------- |
+| A simple listen request (usually via an `<audio>` tag), no password | Continuous MP3 audio (128 kbps by default)           |
+|                                                                     | Song title and cover URL, inside the stream metadata |
 
 The listener sends no personal data and needs no account.
 
@@ -89,10 +93,10 @@ The listener sends no personal data and needs no account.
 **Request type:** HTTP "source" connection that stays open permanently.
 **Authentication:** user `source` + the `ICECAST_PASSWORD` password.
 
-| Sends | Receives |
-|---|---|
+| Sends                                               | Receives                                      |
+| --------------------------------------------------- | --------------------------------------------- |
 | MP3-encoded audio (bitrate 8–320 kbps, default 128) | Confirmation that it was accepted as a source |
-| Radio name, genre, description, website URL | |
+| Radio name, genre, description, website URL         |                                               |
 
 The password must be **identical** in Liquidsoap (`ICECAST_PASSWORD`) and in Icecast (`ICECAST_SOURCE_PASSWORD`). If they differ, Icecast rejects the connection.
 
@@ -103,11 +107,11 @@ The password must be **identical** in Liquidsoap (`ICECAST_PASSWORD`) and in Ice
 **Request type:** `GET` to Icecast's admin endpoint (`/admin/metadata`)
 **Authentication:** same `source` user + password.
 
-| Sends | Receives |
-|---|---|
-| `song` = "Artist - Title" | Simple confirmation (OK) |
-| `url` = link to the album cover (from Discogs) | |
-| For jingles: `song` = `--jingle--` and empty `url` | |
+| Sends                                              | Receives                 |
+| -------------------------------------------------- | ------------------------ |
+| `song` = "Artist - Title"                          | Simple confirmation (OK) |
+| `url` = link to the album cover (from Discogs)     |                          |
+| For jingles: `song` = `--jingle--` and empty `url` |                          |
 
 Metadata is sent separately from the audio so that players keep the cover link.
 
@@ -117,15 +121,15 @@ Metadata is sent separately from the audio so that players keep the cover link.
 
 **Request type:** `GET`, only inside the container (`127.0.0.1:8090`)
 
-| Address | What it requests |
-|---|---|
-| `/stream/tracks` | The next track |
-| `/stream/jingles` | The next jingle |
+| Address           | What it requests |
+| ----------------- | ---------------- |
+| `/stream/tracks`  | The next track   |
+| `/stream/jingles` | The next jingle  |
 
-| Sends | Receives |
-|---|---|
-| A simple request, no data | Audio (HTTP stream) |
-| | Metadata: title and an `Icy-Radio-Jingle` flag (true/false) |
+| Sends                     | Receives                                                    |
+| ------------------------- | ----------------------------------------------------------- |
+| A simple request, no data | Audio (HTTP stream)                                         |
+|                           | Metadata: title and an `Icy-Radio-Jingle` flag (true/false) |
 
 **Rotation logic:** Liquidsoap requests `JINGLE_EVERY` tracks (default 4), then one jingle. If the stream drops, it automatically requests the next one.
 
@@ -137,10 +141,10 @@ The gateway is reachable only from the inside (127.0.0.1). Only its activation t
 
 **Request type:** standard S3 requests (list and read objects). I could not verify the exact details because access to the `s3sg` code was blocked.
 
-| Sends | Receives |
-|---|---|
+| Sends                                                     | Receives                                              |
+| --------------------------------------------------------- | ----------------------------------------------------- |
 | Access keys (`S3_ACCESS_KEY_ID` + `S3_SECRET_ACCESS_KEY`) | Audio files from the `tracks/` and `jingles/` folders |
-| Bucket name and region | |
+| Bucket name and region                                    |                                                       |
 
 Works with any S3-compatible storage (AWS, MinIO, Cloudflare R2) via `S3_ENDPOINT`.
 
@@ -152,10 +156,10 @@ Works with any S3-compatible storage (AWS, MinIO, Cloudflare R2) via `S3_ENDPOIN
 
 **Request type:** `GET` to `https://api.discogs.com`. Enabled only if the Discogs keys are set.
 
-| Step | Request | Sends | Receives |
-|---|---|---|---|
-| 1 | `/database/search` | Artist, title, `type=release`, `per_page=1` + Discogs key/secret | A list with 1 result (id + image) |
-| 2 (if no image) | `/releases/{id}` | The album ID | The list of album images |
+| Step            | Request            | Sends                                                            | Receives                          |
+| --------------- | ------------------ | ---------------------------------------------------------------- | --------------------------------- |
+| 1               | `/database/search` | Artist, title, `type=release`, `per_page=1` + Discogs key/secret | A list with 1 result (id + image) |
+| 2 (if no image) | `/releases/{id}`   | The album ID                                                     | The list of album images          |
 
 - 5-second timeout. If Discogs does not respond or returns an error, the song plays without a cover.
 - Remembers the last lookup (cache) so it does not call the API twice for the same song.
@@ -164,10 +168,9 @@ Works with any S3-compatible storage (AWS, MinIO, Cloudflare R2) via `S3_ENDPOIN
 
 ## What happens when something breaks
 
-| Problem | What the system does |
-|---|---|
-| A track has more than 5 seconds of silence (below -45 dB) | It is skipped automatically |
-| The rotation (tracks + jingles) stops | Uses `FALLBACK_FILE`, or silence if it does not exist |
-| Discogs does not respond | Plays without a cover |
-| Wrong Icecast password | Liquidsoap does not start (checked at startup) |
-
+| Problem                                                   | What the system does                                  |
+| --------------------------------------------------------- | ----------------------------------------------------- |
+| A track has more than 5 seconds of silence (below -45 dB) | It is skipped automatically                           |
+| The rotation (tracks + jingles) stops                     | Uses `FALLBACK_FILE`, or silence if it does not exist |
+| Discogs does not respond                                  | Plays without a cover                                 |
+| Wrong Icecast password                                    | Liquidsoap does not start (checked at startup)        |
