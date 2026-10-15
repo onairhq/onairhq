@@ -37,7 +37,7 @@ services:
     ports:
       - "3001:3000"
     environment:
-      ICECAST_URL: "http://127.0.0.1:8000/local.mp3"
+      STREAM_URL: "http://127.0.0.1:8000/local.mp3"
       ICECAST_HOST: "icecast"
       ICECAST_PORT: "8000"
       ICECAST_MOUNT: "/local.mp3"
@@ -52,7 +52,7 @@ services:
     ports:
       - "3002:3000"
     environment:
-      ICECAST_URL: "http://127.0.0.1:8000/s3.mp3"
+      STREAM_URL: "http://127.0.0.1:8000/s3.mp3"
       ICECAST_HOST: "icecast"
       ICECAST_PORT: "8000"
       ICECAST_MOUNT: "/s3.mp3"
